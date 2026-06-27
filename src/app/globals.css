@@ -21,6 +21,13 @@
 
   --maxw: 1024.5px;
   --pad: clamp(20px, 5vw, 72px);
+  --nav-h: 64px;
+  --line: rgba(0, 0, 0, 0.14);
+
+  /* Canalón fluido: en pantallas anchas crece para centrar el contenido a
+     --maxw, mientras el fondo de cada sección sigue a sangre completa.
+     100% se resuelve respecto al ancho del elemento donde se use. */
+  --gutter: max(var(--pad), calc((100% - var(--maxw)) / 2));
 }
 
 * {
@@ -29,6 +36,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* desplaza el ancla bajo la barra fija al saltar entre secciones */
+  scroll-padding-top: calc(var(--nav-h) + 12px);
 }
 
 body {
@@ -57,7 +66,9 @@ a {
 }
 
 .section {
-  padding: clamp(48px, 9vw, 110px) var(--pad);
+  padding-block: clamp(48px, 9vw, 110px);
+  /* el fondo va a sangre completa; el contenido queda contenido a --maxw */
+  padding-inline: var(--gutter);
 }
 
 .section--peach {
@@ -114,6 +125,8 @@ a {
   align-items: stretch;
   gap: clamp(16px, 4vw, 48px);
   min-height: min(86vh, 720px);
+  /* deja aire bajo la barra fija sin perder el aspecto del encabezado */
+  padding-top: calc(var(--nav-h) + clamp(20px, 5vw, 60px));
   padding-bottom: 0; /* la ilustración queda pegada al borde inferior */
   position: relative;
   z-index: 1;
@@ -337,9 +350,12 @@ a {
   z-index: 2;
 }
 
-/* Hablando Carburo no lleva imagen: el título ocupa una sola columna. */
+/* Hablando Carburo no lleva imagen: el título ocupa una sola columna.
+   Se le da estructura con un filete superior para que no quede vacío. */
 .work--no-media {
   grid-template-columns: 1fr;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: clamp(28px, 5vw, 56px);
 }
 
 /* ---- Contact ---- */
@@ -604,5 +620,189 @@ a:focus-visible {
     width: 100% !important;
     margin: 0 0 14px !important;
     transform: none !important;
+  }
+}
+
+/* ===========================================================
+   Navegación, botón de contacto y pie de página
+   (añadidos para contener la rejilla y mejorar la navegación)
+   =========================================================== */
+
+/* ---- Barra de navegación fija ---- */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  padding-inline: var(--gutter);
+  /* translúcida y oscura: legible sobre cualquier color de sección.
+     rgba de respaldo para navegadores sin color-mix() */
+  background: rgba(46, 34, 21, 0.82);
+  background: color-mix(in srgb, var(--brown-dark) 78%, transparent);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--nav-h);
+}
+
+.nav__brand {
+  font-family: var(--ff-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.2px;
+  color: var(--cream);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 30px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__links a {
+  font-family: var(--ff-hand);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+  text-decoration: none;
+  opacity: 0.82;
+  transition: opacity 0.2s ease;
+}
+
+.nav__links a:hover {
+  opacity: 1;
+}
+
+.nav__links .nav__cta {
+  opacity: 1;
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav__links .nav__cta:hover {
+  background: var(--peach);
+  color: var(--brown-dark);
+  border-color: var(--peach);
+}
+
+/* ---- Botón / llamada a la acción ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--ff-hand);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  text-decoration: none;
+  background: var(--brown-dark);
+  color: var(--cream);
+  padding: 0.8em 1.6em;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(46, 34, 21, 0.25);
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn::after {
+  content: "→";
+  transition: transform 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(46, 34, 21, 0.35);
+}
+
+.btn:hover::after {
+  transform: translateX(5px);
+}
+
+.contact__cta {
+  margin: 0 0 clamp(36px, 6vw, 64px);
+}
+
+/* ---- Pie de página ---- */
+
+.footer {
+  background: var(--brown-dark);
+  color: var(--cream);
+  padding-block: clamp(36px, 6vw, 64px);
+  padding-inline: var(--gutter);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 32px;
+}
+
+.footer__brand {
+  font-family: var(--ff-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--cream);
+  text-decoration: none;
+}
+
+.footer__social {
+  display: flex;
+  gap: clamp(16px, 3vw, 28px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__social a {
+  font-family: var(--ff-hand);
+  text-decoration: none;
+  opacity: 0.85;
+  border-bottom: 1px solid transparent;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.footer__social a:hover {
+  opacity: 1;
+  border-bottom-color: currentColor;
+}
+
+.footer__copy {
+  width: 100%;
+  margin: 0;
+  font-family: var(--ff-hand);
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
+
+/* ---- Responsive de navegación y pie ---- */
+
+@media (max-width: 560px) {
+  .nav__brand {
+    font-size: 0.98rem;
+  }
+
+  /* en móvil se deja solo el botón "Contacto"; el resto se navega scrolleando */
+  .nav__links li:nth-child(-n + 2) {
+    display: none;
+  }
+
+  .footer__inner {
+    justify-content: flex-start;
   }
 }

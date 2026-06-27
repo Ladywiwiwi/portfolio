@@ -111,8 +111,30 @@ const works: Work[] = [
 export default function Home() {
   return (
     <main className="page" aria-label="Portafolio de Damaris Calderón">
+      {/* NAV — barra fija translúcida con salto suave a cada sección */}
+      <nav className="nav" aria-label="Navegación principal">
+        <div className="nav__inner">
+          <a className="nav__brand" href="#inicio">
+            Damaris&nbsp;Calderón
+          </a>
+          <ul className="nav__links">
+            <li>
+              <a href="#sobre-mi">Sobre mí</a>
+            </li>
+            <li>
+              <a href="#trabajos">Trabajos</a>
+            </li>
+            <li>
+              <a className="nav__cta" href="#contacto">
+                Contacto
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
       {/* 01 — HERO */}
-      <header className="section section--peach hero">
+      <header id="inicio" className="section section--peach hero">
         <div className="hero__portrait">
           <img
             className="hero__img"
@@ -177,7 +199,7 @@ export default function Home() {
       </section>
 
       {/* 04–06 — PROYECTOS */}
-      <section className="section section--dark">
+      <section className="section section--dark works">
         {works.map((w) => (
           <article
             key={w.id}
@@ -225,6 +247,12 @@ export default function Home() {
           <br />
           juntos
         </h2>
+        <a
+          className="btn contact__cta reveal"
+          href="mailto:hola@sitioincreible.com.co"
+        >
+          Escríbeme
+        </a>
         <div className="contact__grid reveal reveal--delay">
           <div>
             <p className="contact__label">Dirección</p>
@@ -252,6 +280,30 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer__inner">
+          <a className="footer__brand" href="#inicio">
+            Damaris Calderón
+          </a>
+          {/* TODO: reemplaza los "#" por tus enlaces reales (Instagram, etc.) */}
+          <ul className="footer__social" aria-label="Redes sociales">
+            <li>
+              <a href="#">Instagram</a>
+            </li>
+            <li>
+              <a href="#">LinkedIn</a>
+            </li>
+            <li>
+              <a href="#">Behance</a>
+            </li>
+          </ul>
+          <p className="footer__copy">
+            © 2026 Damaris Calderón · Publicidad y Relaciones Públicas
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
