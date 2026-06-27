@@ -13,7 +13,9 @@ YA AGREGADAS (no tocar):
   sobre-mi.jpg            -> foto de "Más sobre mí" (con filtro sepia por CSS)
 
 PENDIENTES (coloca el archivo con este nombre exacto y aparece solo):
-  hablando-carburo-1.jpg  -> proyecto Hablando Carburo
   contacto.jpg            -> foto de "Trabajemos juntos"
+
+NOTA: "Hablando Carburo" en el diseño SVG no lleva imagen (solo el título),
+por eso no tiene placeholder.
 
 Acepta .jpg, .png o .webp. Si usas otra extensión, avísame y ajusto el código.

@@ -115,6 +115,8 @@ a {
   gap: clamp(16px, 4vw, 48px);
   min-height: min(86vh, 720px);
   padding-bottom: 0; /* la ilustración queda pegada al borde inferior */
+  position: relative;
+  z-index: 1;
 }
 
 .hero__portrait {
@@ -124,6 +126,10 @@ a {
   justify-content: flex-start;
   /* sangra hasta el borde izquierdo del hero, sin espacio en blanco */
   margin-left: calc(var(--pad) * -1);
+  /* la ilustración baja y se mete detrás de la sección siguiente,
+     así su borde inferior nunca se ve cortado por la línea */
+  position: relative;
+  top: clamp(50px, 7vw, 100px);
 }
 
 .hero__portrait .ph {
@@ -171,6 +177,9 @@ a {
   grid-template-columns: 1.2fr 0.8fr;
   gap: clamp(24px, 5vw, 64px);
   align-items: start;
+  /* va por encima del hero para cubrir el remate de la ilustración */
+  position: relative;
+  z-index: 2;
 }
 
 .about__heading {
@@ -250,38 +259,87 @@ a {
   opacity: 0.6;
 }
 
+/* ---- Collage de imágenes (encimadas e inclinadas, como en el SVG) ---- */
+
 .work__media {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-
-/* placeholders todavía sin imagen */
-.work__media .ph {
-  aspect-ratio: 3 / 4;
-}
-
-.work__media .ph.media--wide {
-  aspect-ratio: 16 / 10;
-}
-
-/* imágenes reales: se muestran completas, a su proporción natural */
-.work__media .media {
   width: 100%;
-  height: auto;
+}
+
+.work__collage {
+  position: relative;
+  width: 100%;
+}
+
+.c-img {
+  position: absolute;
   border-radius: 6px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  background: #fff;
 }
 
-.work__media .media--wide {
-  grid-column: span 2;
+/* La imagen "base" va en flujo normal y define la altura del collage. */
+.c-base {
+  position: relative;
+  z-index: 1;
 }
 
-.work__media .media--tall {
-  grid-row: span 2;
-  height: 100%;
-  object-fit: cover;
+/* --- BUBACAT: folleto grande + valla pequeña arriba-dcha + menú abajo --- */
+.work--bubacat .work__collage {
+  padding-bottom: 26%;
+}
+
+.work--bubacat .c-base {
+  width: 70%;
+  margin-top: 6%;
+}
+
+.work--bubacat .c-tr {
+  top: 0;
+  right: 0;
+  width: 34%;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+.work--bubacat .c-bottom {
+  bottom: 0;
+  left: 12%;
+  width: 66%;
+  transform: rotate(-4deg);
+  z-index: 3;
+}
+
+/* --- LÍNEA MODERNA y EL RASTRO: página grande + 2ª encimada abajo-dcha --- */
+.work--linea-moderna .work__collage,
+.work--el-rastro .work__collage {
+  padding-bottom: 24%;
+  padding-right: 6%;
+}
+
+.work--linea-moderna .c-base,
+.work--el-rastro .c-base {
+  width: 66%;
+}
+
+.work--linea-moderna .c-br {
+  bottom: 0;
+  right: 0;
+  width: 62%;
+  transform: rotate(-3deg);
+  z-index: 2;
+}
+
+.work--el-rastro .c-br {
+  bottom: 0;
+  right: 0;
+  width: 62%;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+/* Hablando Carburo no lleva imagen: el título ocupa una sola columna. */
+.work--no-media {
+  grid-template-columns: 1fr;
 }
 
 /* ---- Contact ---- */
@@ -394,6 +452,114 @@ a {
   border: 0;
 }
 
+/* ===========================================================
+   Animaciones y microinteracciones
+   =========================================================== */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* flotación suave y constante de la ilustración del hero */
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-8px) rotate(1.3deg);
+  }
+  70% {
+    transform: translateY(-5px) rotate(-1.3deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* entrada escalonada del hero al cargar */
+  .hero__year {
+    animation: fade-up 0.7s 0.15s both;
+  }
+  .hero__title {
+    animation: fade-up 0.85s 0.3s both;
+  }
+  .hero__tags {
+    animation: fade-up 0.7s 0.55s both;
+  }
+
+  /* la ilustración entra y luego flota para siempre */
+  .hero__img {
+    transform-origin: bottom center;
+    animation: hero-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both,
+      hero-float 7s ease-in-out 1s infinite;
+  }
+
+  /* revelado al hacer scroll (degrada con elegancia si no hay soporte) */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      opacity: 0;
+      animation: fade-up 0.9s linear both;
+      animation-timeline: view();
+      animation-range: entry 4% entry 46%;
+    }
+    .reveal--delay {
+      animation-range: entry 16% entry 58%;
+    }
+  }
+}
+
+/* hover de los collages: se elevan y resaltan */
+.work__collage {
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.work:hover .work__collage {
+  transform: translateY(-10px);
+}
+.c-img {
+  transition: box-shadow 0.45s ease;
+}
+.work:hover .c-base {
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* flecha animada en "Más información" */
+.work__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.work__link::after {
+  content: "→";
+  transition: transform 0.3s ease;
+}
+.work__link:hover::after {
+  transform: translateX(5px);
+}
+
+/* foco accesible */
+a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 760px) {
@@ -409,6 +575,7 @@ a {
     max-width: 340px;
     margin-left: 0;
     justify-content: center;
+    top: 0; /* en móvil la ilustración no necesita sangrar hacia abajo */
   }
 
   .hero__body {
@@ -425,5 +592,17 @@ a {
 
   .hero__year {
     align-self: flex-start;
+  }
+
+  /* el collage se apila en vertical, sin superposición ni inclinación */
+  .work__collage {
+    padding: 0 !important;
+  }
+
+  .c-img {
+    position: static !important;
+    width: 100% !important;
+    margin: 0 0 14px !important;
+    transform: none !important;
   }
 }

@@ -23,12 +23,20 @@ function Figure({ label, src, alt, wide, tall }: Media) {
   );
 }
 
+/* Cada trabajo se muestra como un collage de imágenes encimadas e inclinadas,
+   igual que en el diseño SVG. role -> posición dentro del collage. */
+type CollageImg = {
+  src: string;
+  alt: string;
+  role: "base" | "tr" | "br" | "bottom";
+};
+
 type Work = {
   id: string;
   title: string;
   subtitle: string;
   reverse: boolean;
-  media: Media[];
+  collage: CollageImg[];
 };
 
 const works: Work[] = [
@@ -37,19 +45,21 @@ const works: Work[] = [
     title: "BUBACAT",
     subtitle: "Prototipo de Marca (Cafetería)",
     reverse: false,
-    media: [
-      {
-        src: "/img/bubacat-3.webp",
-        label: "Valla publicitaria Muffin Cream de Bubacat",
-        tall: true,
-      },
+    collage: [
       {
         src: "/img/bubacat-1.png",
-        label: "Folleto de Bubacat sostenido por una clienta",
+        alt: "Folleto de Bubacat sostenido por una clienta",
+        role: "base",
+      },
+      {
+        src: "/img/bubacat-3.webp",
+        alt: "Valla publicitaria Muffin Cream de Bubacat",
+        role: "tr",
       },
       {
         src: "/img/bubacat-2.png",
-        label: "Folleto de Bubacat abierto mostrando el menú",
+        alt: "Folleto de Bubacat abierto mostrando el menú",
+        role: "bottom",
       },
     ],
   },
@@ -57,15 +67,17 @@ const works: Work[] = [
     id: "linea-moderna",
     title: "LÍNEA MODERNA",
     subtitle: "Prototipo de Revista Digital",
-    reverse: true,
-    media: [
+    reverse: false,
+    collage: [
       {
         src: "/img/linea-moderna-1.webp",
-        label: "Portada de la revista Línea Moderna",
+        alt: "Portada de la revista Línea Moderna",
+        role: "base",
       },
       {
         src: "/img/linea-moderna-2.webp",
-        label: "Página interior de la revista Línea Moderna",
+        alt: "Página interior de la revista Línea Moderna",
+        role: "br",
       },
     ],
   },
@@ -73,12 +85,17 @@ const works: Work[] = [
     id: "el-rastro",
     title: "EL RASTRO",
     subtitle: "Prototipo de Boletín Institucional",
-    reverse: false,
-    media: [
-      { src: "/img/el-rastro-1.webp", label: "Portada del boletín El Rastro" },
+    reverse: true,
+    collage: [
+      {
+        src: "/img/el-rastro-1.webp",
+        alt: "Portada del boletín El Rastro",
+        role: "base",
+      },
       {
         src: "/img/el-rastro-2.webp",
-        label: "Página interior del boletín El Rastro",
+        alt: "Página interior del boletín El Rastro",
+        role: "br",
       },
     ],
   },
@@ -87,7 +104,7 @@ const works: Work[] = [
     title: "Hablando Carburo",
     subtitle: "Dirección y edición de cortos",
     reverse: true,
-    media: [{ label: "hablando-carburo-1.jpg", wide: true }],
+    collage: [],
   },
 ];
 
@@ -119,7 +136,7 @@ export default function Home() {
 
       {/* 02 — MÁS SOBRE MÍ */}
       <section id="sobre-mi" className="section section--mid about">
-        <div>
+        <div className="reveal">
           <p className="index-num">02</p>
           <h2 className="display about__heading">
             Más
@@ -139,7 +156,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="about__photo">
+        <div className="about__photo reveal reveal--delay">
           <Figure
             src="/img/sobre-mi.jpg"
             label="Damaris Calderón en una cafetería"
@@ -152,7 +169,7 @@ export default function Home() {
         <p className="index-num" style={{ textAlign: "center" }}>
           03
         </p>
-        <h2 className="display works-intro__title">
+        <h2 className="display works-intro__title reveal">
           Algunos de
           <br />
           mis trabajos
@@ -165,14 +182,26 @@ export default function Home() {
           <article
             key={w.id}
             id={w.id}
-            className={`work${w.reverse ? " work--reverse" : ""}`}
+            className={`work work--${w.id}${w.reverse ? " work--reverse" : ""}${
+              w.collage.length ? "" : " work--no-media"
+            }`}
           >
-            <div className="work__media">
-              {w.media.map((m) => (
-                <Figure key={m.label} {...m} />
-              ))}
-            </div>
-            <div className="work__info">
+            {w.collage.length > 0 && (
+              <div className="work__media reveal">
+                <div className="work__collage">
+                  {w.collage.map((m) => (
+                    <img
+                      key={m.src}
+                      className={`c-img c-${m.role}`}
+                      src={m.src}
+                      alt={m.alt}
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="work__info reveal reveal--delay">
               <h3 className="display work__title">{w.title}</h3>
               <p className="work__subtitle">{w.subtitle}</p>
               <a className="work__link" href={`#${w.id}`}>
@@ -188,15 +217,15 @@ export default function Home() {
         <p className="index-num" style={{ textAlign: "left" }}>
           07
         </p>
-        <div className="contact__photo">
+        <div className="contact__photo reveal">
           <Figure label="contacto.jpg (foto)" />
         </div>
-        <h2 className="contact__title">
+        <h2 className="contact__title reveal">
           Trabajemos
           <br />
           juntos
         </h2>
-        <div className="contact__grid">
+        <div className="contact__grid reveal reveal--delay">
           <div>
             <p className="contact__label">Dirección</p>
             <p className="contact__value">
